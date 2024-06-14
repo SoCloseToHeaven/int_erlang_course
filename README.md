@@ -3,4 +3,4 @@ int_erlang_course
 
 
 # Useful links
-- https://www.erlang.org/doc/system/expressions#patterns
+- https://www.erlang.org/doc/readme.html
