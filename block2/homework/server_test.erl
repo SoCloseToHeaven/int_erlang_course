@@ -13,7 +13,8 @@
 -export([
   test_add_example/0,
   parallel_connections_test/0,
-  parallel_connection_fun/2
+  parallel_connection_fun/2,
+  test_polish_notation/0
 ]).
 
 test_add_example() ->
@@ -46,4 +47,37 @@ parallel_connections_test() ->
 
   Spawned = [spawn(?MODULE, parallel_connection_fun, [List, ServerID]) || List <- AllArgs],
   io:format("Spawned: ~w~nPlease wait for results!~n", [Spawned]).
+
+
+test_polish_notation() ->
+  io:format("@@@ Polish Notation Test @@@~n", []),
+  ServerID = server:connect(),
+
+  Request1 = {add,
+    [1,
+      {'div',
+        [2,
+          {sub,
+            [5, 5]
+          }
+        ]
+      }
+    ]
+  },
+  Request2 = {add,
+    [1,
+      {'div',
+        [2,
+          {add,
+            [1, 1]
+          }
+        ]
+      }
+    ]
+  },
+  io:format("Server ID - ~w~n", [ServerID]),
+
+  Response1 = server:calculate(ServerID, Request1),
+  Response2 = server:calculate(ServerID, Request2),
+  {Response1, Response2}.
 
