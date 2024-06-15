@@ -21,7 +21,8 @@ long_random_fun(Randomizer) when is_integer(Randomizer) andalso Randomizer >= 0 
         timer:sleep(1000 * RandNum),
         io:format("~p: Process stopped sleeping, it has been sleeping for ~p seconds\n", [self(), RandNum]).
 
-emulate_long_evaluations(N) when is_integer(N) andalso N >= 1 -> [spawn(?MODULE, long_random_fun, [I]) || I <- lists:seq(1, N)].
+emulate_long_evaluations(N) when is_integer(N) andalso N >= 1 ->
+    [proc_lib:spawn(?MODULE, long_random_fun, [I]) || I <- lists:seq(1, N)].
 
 
 
@@ -37,12 +38,12 @@ parallel_map_example() ->
 parralel_map(_Func, []) ->
     ParentID = self(),
 
-    spawn(fun() -> ParentID ! ok end);
+    proc_lib:spawn(fun() -> ParentID ! ok end);
 
 parralel_map(Function, [H | T]) ->
     ParentID = self(),
 
-    spawn(fun() -> ParentID ! Function(H) end),
+    proc_lib:spawn(fun() -> ParentID ! Function(H) end),
 
     parralel_map(Function, T).
 
