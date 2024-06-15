@@ -18,7 +18,11 @@
   apply_operation/1,
   add_operation/1,
   add_operation/2,
-  calculate/2
+  calculate/2,
+  sub_operation/1,
+  multiply_operation/1,
+  multiply_operation/2,
+  divide_operation/1
 ]).
 
 
@@ -40,7 +44,10 @@ handle_connection() ->
 
 apply_operation({Operation, Args} = Message) when is_atom(Operation) andalso is_list(Args) ->
   case Message of
-    {add, Args} when is_list(Args) -> {ok, add_operation(Args)};
+    {add, Args} -> add_operation(Args);
+    {sub, Args} -> sub_operation(Args);
+    {mul, Args} -> multiply_operation(Args);
+    {'div', Args} -> divide_operation(Args);
     _Other -> {error, no_such_operation}
   end
 .
@@ -49,11 +56,29 @@ calculate(Pid, {Operation, Args} = Message) when is_atom(Operation) andalso is_l
     From = self(),
     Pid ! {From, Message},
     receive
-      {ok, _Result} = Reply -> Reply
+      Reply -> Reply
     end.
 
 
 add_operation([H | T]) when is_number(H) -> add_operation(H, T).
 add_operation(Acc, [H | T]) when is_number(Acc) andalso is_number(H)-> add_operation(Acc + H, T);
-add_operation(Acc, []) when is_number(Acc)-> Acc.
+add_operation(Acc, []) when is_number(Acc)-> {ok, Acc}.
+
+sub_operation([H | T]) -> {ok, H - lists:sum(T)}.
+
+
+multiply_operation([H | T]) when is_number(H) -> {ok, multiply_operation(1, [H | T])}.
+multiply_operation(Acc, []) when is_number(Acc) -> Acc;
+multiply_operation(Acc, [H | T]) when is_number(Acc) andalso is_number(H) ->
+  NewAcc = Acc * H,
+  multiply_operation(NewAcc, T).
+
+
+divide_operation([H | T]) when is_number(H) ->
+  case multiply_operation(T) of
+    0 -> {error, division_by_zero};
+    Mul -> {ok, H / Mul}
+  end.
+
+
 
