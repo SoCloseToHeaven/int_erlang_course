@@ -31,9 +31,9 @@ handle_connection() ->
   ID = self(),
   receive
     {From, Message} when is_pid(From) ->
-      io:format("Calculator Server PID#~p - Got Message - ~w~n", [ID, Message]),
+      io:format("Calculator Server PID#~p - Got Message - ~w - From - ~w~n", [ID, Message, From]),
       Reply = apply_operation(Message),
-      io:format("Calculator Server PID#~p - Got Reply - ~w~n", [ID, Reply]),
+      io:format("Calculator Server PID#~p - Got Reply - ~w - To - ~w~n", [ID, Reply, From]),
       From ! Reply
   end,
   handle_connection().
