@@ -51,23 +51,20 @@ chain_receive(N, Pid, To) when is_integer(N) andalso is_pid(Pid) andalso is_pid(
       io:format("[N: ~w] ~w:  EXIT SIGNAL - CHAIN ENDPOINT: ~w~n", [N, Pid, Reason]),
       exit(Reason);
     {From, Original} = Msg when is_pid(From) ->
-      io:format("[N: ~w] ~w:  GOT MESSAGE: ~p~n", [N, Pid, Msg]),
-      To ! {Pid, Original},
-
-      chain_receive(N, Pid, To)
-  end.
+      io:format("[N: ~w] ~w:  CHAIN MESSAGE: ~p~n", [N, Pid, Msg]),
+      To ! {Pid, Original};
+    Msg ->
+      io:format("[N: ~w] ~w:  NEW MESSAGE IN CHAIN: ~p~n", [N, Pid, Msg]),
+      To ! {Pid, Msg}
+  end,
+  chain_receive(N, Pid, To).
 
 
 chain(0 = N, PrevID) when is_pid(PrevID) ->
-  OriginalMessage = "This is simple chain",
-
   process_flag(trap_exit, true), %% Put exit signal to mailbox as a regular message
   Pid = self(),
 
-
-  PrevID ! {Pid, OriginalMessage},
-
-  io:format("[N: ~w] ~w: START MESSAGE CHAIN - ~p~n", [N, Pid, OriginalMessage]),
+  io:format("[N: ~w] ~w: MESSAGE CHAIN CONFIGURED ~n", [N, Pid]),
 
   chain_receive(N, Pid, PrevID);
 
@@ -95,5 +92,9 @@ chain(N) when is_integer(N) ->
 
 chain_use_example() ->
   Pid = spawn (fun() -> chain(4) end),
+
+  Pid ! "First msg",
+  Pid ! "Second msg",
+
   timer:sleep(10 * 1000),
   exit(Pid, just_for_fun).
