@@ -1,6 +1,5 @@
-#### int_erlang_course
-int_erlang_course
+# int_erlang_course
 
-
-# Useful links
+### Useful links
 - https://www.erlang.org/doc/readme.html
+- https://learnyousomeerlang.com
