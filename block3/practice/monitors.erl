@@ -14,7 +14,6 @@
 %% API
 -export([
   spawn_monitors/2,
-  spawn_monitors/3,
   psycho/2,
   spawn_psycho/2,
   spawn_citizens/2,
@@ -22,14 +21,16 @@
 ]).
 
 
-spawn_monitors(0, List, Function) when is_list(List) andalso is_function(Function) ->
-  Info = spawn_monitor(Function),
-  List ++ [Info];
-spawn_monitors(N, List, Function) when is_integer(N) andalso is_list(List) andalso is_function(Function) ->
-  Info = spawn_monitor(Function),
-  NewList = List ++ [Info],
-  spawn_monitors(N - 1, NewList, Function).
-spawn_monitors(N, Function) when is_integer(N) andalso is_function(Function) -> spawn_monitors(N, [], Function).
+%%spawn_monitors(0, List, Function) when is_list(List) andalso is_function(Function) ->
+%%  Info = spawn_monitor(Function),
+%%  List ++ [Info];
+%%spawn_monitors(N, List, Function) when is_integer(N) andalso is_list(List) andalso is_function(Function) ->
+%%  Info = spawn_monitor(Function),
+%%  NewList = List ++ [Info],
+%%  spawn_monitors(N - 1, NewList, Function).
+%%spawn_monitors(N, Function) when is_integer(N) andalso is_function(Function) -> spawn_monitors(N, [], Function).
+
+spawn_monitors(N, Function) when is_integer(N) andalso N > 0 -> [spawn_monitor(Function) || _ <- lists:seq(1, N)].
 
 
 %% Currently there can only be one psycho
