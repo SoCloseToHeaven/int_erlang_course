@@ -9,6 +9,8 @@
 -module(monitors).
 -author("dmitry").
 
+-include("monitors.hrl").
+
 %% API
 -export([
   spawn_monitors/2,
@@ -75,13 +77,11 @@ citizen(Interval) when is_integer(Interval) andalso Interval > 0 ->
 spawn_citizens(N, Interval) when is_integer(N) andalso is_integer(Interval) -> spawn_monitors(N, fun() -> citizen(Interval) end).
 
 weird_situation_example() ->
-  CitizenInterval = 8 * 1000,
-  PsychoInterval = 3 * 1000,
 
-  Citizens = spawn_citizens(10, CitizenInterval),
+  Citizens = spawn_citizens(10, ?CITIZEN_INTERVAL),
 
   Prey = lists:map(fun({Pid, _Ref} = _) -> Pid end, Citizens),
-  Psycho = spawn_psycho(Prey, PsychoInterval),
+  Psycho = spawn_psycho(Prey, ?PSYCHO_INTERVAL),
 
   receive_loop(Citizens),
 
@@ -91,11 +91,13 @@ weird_situation_example() ->
 receive_loop([]) -> io:format("Seems like no one left...~n", []);
 receive_loop(Citizens) when is_list(Citizens) ->
     receive
-      {'DOWN', Ref, process, Pid, killed} = Msg when is_reference(Ref) andalso is_pid(Pid) ->
-        erlang:display(Msg),
-        receive_loop(lists:delete({Pid, Ref}, Citizens));
-      {'DOWN', Ref, process, Pid, suicide} = Msg when is_reference(Ref) andalso is_pid(Pid) ->
-        erlang:display(Msg);
+      #down_msg{state = 'DOWN', ref = Ref, process = process, pid = Pid, reason = killed} = Msg
+        when is_reference(Ref) andalso is_pid(Pid) ->
+          erlang:display(Msg),
+          receive_loop(lists:delete({Pid, Ref}, Citizens));
+      #down_msg{state = 'DOWN', ref = Ref, process = process, pid = Pid, reason = suicide} = Msg
+        when is_reference(Ref) andalso is_pid(Pid) ->
+          erlang:display(Msg);
       _ -> receive_loop(Citizens)
   end.
 
