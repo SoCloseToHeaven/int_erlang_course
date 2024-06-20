@@ -17,7 +17,8 @@
   psycho/2,
   spawn_psycho/2,
   spawn_citizens/2,
-  weird_situation_example/0
+  weird_situation_example/0,
+  terminate/1
 ]).
 
 
