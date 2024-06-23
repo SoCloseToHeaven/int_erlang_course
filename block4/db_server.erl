@@ -10,6 +10,7 @@
 -author("dmitry").
 
 -include("include/db.hrl").
+-include("commands.erl").
 
 -export([
   start_server/0,
