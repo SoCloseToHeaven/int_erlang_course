@@ -48,6 +48,10 @@ loop(Socket) ->
     {tcp, Socket, Bin} ->
       io:format("RECEIVED BINARY - ~p~n", [Bin]),
       Str = binary_to_term(Bin),
-      %%      TODO
-      loop(Socket)
+      Reply = process_command(Str),
+      io:format("SERVER REPLY - ~p~n", [Reply]),
+      BinReply = term_to_binary(Reply),
+      gen_tcp:send(Socket, BinReply),
+      loop(Socket);
+    {tcp_closed, Socket} -> io:format("Server socket closed ~n")
   end.
