@@ -10,3 +10,5 @@
 
 
 -record(entry, {key, value}).
+
+-define(SERVER_PORT, 10111).

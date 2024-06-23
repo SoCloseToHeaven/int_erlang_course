@@ -9,13 +9,7 @@
 -module(db_client).
 -author("dmitry").
 
+-include("include/db.hrl").
+
 %% API
--export([
-  start_server/0,
-  stop_server/0
-]).
-
-
-start_server() -> ok.
-
-stop_server() -> ok.
+-export([]).
