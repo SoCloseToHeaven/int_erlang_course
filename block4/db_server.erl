@@ -42,7 +42,6 @@ par_connect(Listen) ->
   spawn(fun() -> par_connect(Listen) end),
   loop(Socket).
 
-
 loop(Socket) ->
   receive
     {tcp, Socket, Bin} ->
