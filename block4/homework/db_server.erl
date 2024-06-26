@@ -12,7 +12,7 @@
 -include("include/db.hrl").
 
 -export([start_server/0, stop_server/0]).
-
+-export([loop/1, par_connect/1, init_db/0]).
 -export([process_command/1, execute_command/2, get_first/1]).
 
 %% Public
@@ -70,8 +70,6 @@ get_first([]) -> {error, no_such_element};
 get_first([H | _T]) -> {ok, H}.
 
 execute_command(<<"get">>, [Key | _T]) -> get_first(mnesia:read(#entry{key = Key}));
-execute_command(<<"set">>, [Key | [Value | []]]) ->
-  mnesia:write(#entry{key = Key, value = Value}),
-  {ok, Key, Value};
+execute_command(<<"set">>, [Key | [Value | []]]) -> {mnesia:write(#entry{key = Key, value = Value}), Key, Value};
 execute_command(<<"delete">>, [Key | _T]) -> {mnesia:delete_object(#entry{key = Key}), Key};
 execute_command(_Command, _Args) -> {error, bad_option}.
