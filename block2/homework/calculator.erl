@@ -9,9 +9,7 @@
 -module(calculator).
 -author("dmitry").
 
--include_lib("kernel/include/logger.hrl").
-
--define(ALLOWED_OPERATIONS, ['+', '-', '*', '/']).
+-include("calculator.hrl").
 
 %% API
 -export([
