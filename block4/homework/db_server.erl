@@ -10,12 +10,10 @@
 -author("dmitry").
 
 -include("include/db.hrl").
--include("commands.erl").
 
--export([
-  start_server/0,
-  stop_server/0
-]).
+-export([start_server/0, stop_server/0]).
+
+-export([process_command/1, execute_command/2, get_first/1]).
 
 %% Public
 start_server() ->
@@ -46,11 +44,29 @@ loop(Socket) ->
   receive
     {tcp, Socket, Bin} ->
       io:format("RECEIVED BINARY - ~p~n", [Bin]),
+
       Str = binary_to_term(Bin),
+
       Reply = process_command(Str),
+
       io:format("SERVER REPLY - ~p~n", [Reply]),
+
       BinReply = term_to_binary(Reply),
+
       gen_tcp:send(Socket, BinReply),
+
       loop(Socket);
     {tcp_closed, Socket} -> io:format("Server socket closed ~n")
   end.
+
+
+process_command(Str) ->
+  [Command | Args] = string:split(Str, " ", all),
+
+  mnesia:transaction(fun() -> execute_command(Command, Args) end).
+
+
+get_first([]) -> {error, no_such_element};
+get_first([H | _T]) -> {ok, H}.
+
+execute_command(<<"get">>, [Key | _T]) -> get_first({entry, Key}).
