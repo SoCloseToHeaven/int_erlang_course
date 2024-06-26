@@ -58,9 +58,10 @@ loop(Socket) ->
 
 
 process_command(Str) ->
-  [Command | Args] = string:split(Str, " ", all),
-
-  mnesia:transaction(fun() -> execute_command(Command, Args) end).
+  case string:split(Str, " ", all) of
+    [Command | Args] -> mnesia:transaction(fun() -> execute_command(Command, Args) end);
+    _Other -> {error, bad_command}
+  end.
 
 
 get_first([]) -> {error, no_such_element};
