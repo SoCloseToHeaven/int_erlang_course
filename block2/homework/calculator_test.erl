@@ -34,3 +34,13 @@ basic_operations_test() ->
   ?assertEqual(RealResults, ExpectedResults),
 
   exit(Pid, normal).
+
+
+bad_request_test() ->
+  Pid = calculator:connect(),
+
+  Result = calculator:calculate(Pid, bad),
+
+  ?assertEqual({error, bad_request}, Result),
+
+  exit(Pid, normal).

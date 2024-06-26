@@ -44,7 +44,8 @@ calculate(Pid, {Operation, Args} = Message) when is_atom(Operation) andalso is_l
     Pid ! {From, Message},
     receive
       Reply -> Reply
-    end.
+    end;
+calculate(_Pid, _Msg) -> {error, bad_request}.
 
 
 is_allowed(Operation) -> lists:member(Operation, ?ALLOWED_OPERATIONS).
