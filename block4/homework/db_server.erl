@@ -18,15 +18,12 @@
 %% Public
 start_server() ->
   init_db(),
-  {ok, Listen} = gen_tcp:listen(
-    ?SERVER_PORT,
-    [binary, {packat, 4}, {reuseaddr, true}, {active, true}]
-  ),
+  {ok, Listen} = gen_tcp:listen(?SERVER_PORT, [binary, {packet, 4}, {reuseaddr, true}, {active, false}]),
   spawn(fun() -> par_connect(Listen) end).
 
 
 %% Public
-stop_server() -> ok.
+stop_server() -> mnesia:stop().
 
 
 %% Private
@@ -56,7 +53,7 @@ loop(Socket) ->
       gen_tcp:send(Socket, BinReply),
 
       loop(Socket);
-    {tcp_closed, Socket} -> io:format("Server socket closed ~n")
+    {tcp_closed, _Socket} -> io:format("Server socket closed ~n")
   end.
 
 

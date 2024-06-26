@@ -11,5 +11,5 @@
 
 -record(entry, {key, value}).
 
--define(SERVER_PORT, 10111).
+-define(SERVER_PORT, 5891).
 -define(SERVER_HOST, "localhost").
