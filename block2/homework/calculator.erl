@@ -6,7 +6,7 @@
 %%% @end
 %%% Created : 15. июнь 2024 22:31
 %%%-------------------------------------------------------------------
--module(server).
+-module(calculator).
 -author("dmitry").
 
 -include_lib("kernel/include/logger.hrl").
@@ -26,19 +26,11 @@
 ]).
 
 
-connect() ->
-  Pid = spawn(?MODULE, handle_connection, []),
-  io:format("Started Calculator Server with PID=~w~n", [Pid]),
-  Pid.
+connect() -> spawn(?MODULE, handle_connection, []).
 
 handle_connection() ->
-  ID = self(),
   receive
-    {From, Message} when is_pid(From) ->
-      io:format("Calculator Server PID#~p - Got Message - ~w - From - ~w~n", [ID, Message, From]),
-      Reply = apply_operation(Message),
-      io:format("Calculator Server PID#~p - Got Reply - ~w - To - ~w~n", [ID, Reply, From]),
-      From ! Reply
+    {From, Message} when is_pid(From) -> From ! apply_operation(Message)
   end,
   handle_connection().
 
