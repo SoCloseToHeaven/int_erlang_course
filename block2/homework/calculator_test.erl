@@ -11,6 +11,7 @@
 
 -define(SLEEP_TIME, 1 * 100).
 -define(BASIC_ARGS, [1, 2]).
+-define(ZERO_DIVISION_ARGS, [1, 0]).
 
 -include_lib("eunit/include/eunit.hrl").
 -include("calculator.hrl").
@@ -40,7 +41,7 @@ basic_operations_test() ->
 zero_division_test() ->
   Pid = calculator:connect(),
 
-  {'EXIT', {Reason, _}} = calculator:calculate(Pid, {'/', [1, 0]}),
+  {'EXIT', {Reason, _}} = calculator:calculate(Pid, {'/', ?ZERO_DIVISION_ARGS}),
 
   ?assertEqual(badarith, Reason),
 
@@ -52,5 +53,15 @@ bad_request_test() ->
   Result = calculator:calculate(Pid, bad),
 
   ?assertEqual({error, bad_request}, Result),
+
+  exit(Pid, normal).
+
+
+polish_notation_test() ->
+  Pid = calculator:connect(),
+
+  Result = calculator:calculate(Pid, {'+', [1, {'+', ?BASIC_ARGS}]}),
+
+  ?assertEqual(lists:sum([1] ++ ?BASIC_ARGS), Result),
 
   exit(Pid, normal).
