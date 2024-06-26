@@ -16,7 +16,7 @@
 -behavior(gen_server).
 
 %% API
--export([init/1, start_link/0, handle_call/3]).
+-export([init/1, start_link/0, handle_call/3, handle_cast/2]).
 -export([execute_operation/1]).
 
 
