@@ -36,6 +36,16 @@ basic_operations_test() ->
   exit(Pid, normal).
 
 
+
+zero_division_test() ->
+  Pid = calculator:connect(),
+
+  {'EXIT', {Reason, _}} = calculator:calculate(Pid, {'/', [1, 0]}),
+
+  ?assertEqual(badarith, Reason),
+
+  exit(Pid, normal).
+
 bad_request_test() ->
   Pid = calculator:connect(),
 
