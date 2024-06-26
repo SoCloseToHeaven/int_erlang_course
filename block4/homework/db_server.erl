@@ -69,4 +69,9 @@ process_command(Str) ->
 get_first([]) -> {error, no_such_element};
 get_first([H | _T]) -> {ok, H}.
 
-execute_command(<<"get">>, [Key | _T]) -> get_first({entry, Key}).
+execute_command(<<"get">>, [Key | _T]) -> get_first(mnesia:read(#entry{key = Key}));
+execute_command(<<"set">>, [Key | [Value | []]]) ->
+  mnesia:write(#entry{key = Key, value = Value}),
+  {ok, Key, Value};
+execute_command(<<"delete">>, [Key | _T]) -> {mnesia:delete_object(#entry{key = Key}), Key};
+execute_command(_Command, _Args) -> {error, bad_option}.
