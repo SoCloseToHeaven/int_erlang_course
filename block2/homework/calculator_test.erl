@@ -6,7 +6,7 @@
 %%% @end
 %%% Created : 16. июнь 2024 00:03
 %%%-------------------------------------------------------------------
--module(server_test).
+-module(calculator_test).
 -author("dmitry").
 
 -define(SLEEP_TIME, 1 * 100).
