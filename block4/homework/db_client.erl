@@ -22,6 +22,8 @@ connect() ->
 
 loop(Socket) ->
   Input = io:get_line("Input request in one line: \n"),
+  BinInput = term_to_binary(Input),
+  io:format("GOT BINARY INPUT - ~p - SENDING TO SOCKET - ~p ~n", [BinInput, Socket]),
   gen_tcp:send(Socket, term_to_binary(Input)),
   receive
     {tcp, Socket, Bin} ->

@@ -33,9 +33,18 @@ init_db() ->
   mnesia:create_table(entry, [{attributes, record_info(fields, entry)}]).
 
 par_connect(Listen) ->
-  {ok, Socket} = gen_tcp:accept(Listen),
-  spawn(fun() -> par_connect(Listen) end),
-  loop(Socket).
+  case gen_tcp:accept(Listen) of
+    {ok, Socket} ->
+      io:format("SERVER - ~p - LISTEN SOCKET ACCEPTED CONNECTION WITH SOCKET - ~p ~n", [Listen, Socket]),
+
+      Pid = spawn(fun() -> par_connect(Listen) end),
+      io:format("SERVER - ~p - LISTEN SOCKET IS READY FOR FURTHER CONNECTIONS - ~p - NEXT PAR CONNECT PID", [Listen, Pid]),
+
+      loop(Socket);
+    Other ->
+      io:format("SERVER - ~p - LISTEN SOCKET CAN'T ACCEPT CONNECTION - ~p ~n", [Listen, Other]),
+      par_connect(Listen)
+  end.
 
 loop(Socket) ->
   receive
@@ -53,7 +62,8 @@ loop(Socket) ->
       gen_tcp:send(Socket, BinReply),
 
       loop(Socket);
-    {tcp_closed, _Socket} -> io:format("Server socket closed ~n")
+    {tcp_closed, _Socket} -> io:format("Server socket closed ~n");
+    Other -> io:format("GOT INCORRECT MESSAGE - ~p ~n", [Other])
   end.
 
 
