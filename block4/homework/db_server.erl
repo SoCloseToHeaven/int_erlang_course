@@ -74,6 +74,7 @@ handle_receive_msg({tcp, Socket, Bin}, Callback) ->
   BinReply = term_to_binary(Reply),
   gen_tcp:send(Socket, BinReply),
   Callback().
+%% TODO: add handling other messages
 
 
 handle_command(Str) -> transform_execute(string:split(Str, " ", all)).

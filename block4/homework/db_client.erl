@@ -12,7 +12,7 @@
 -include("include/db.hrl").
 
 %% API
--export([connect/0, loop/1, handle_input/1, handle_receive_msg/2, handle_receive/1]).
+-export([connect/0, loop/1, handle_input/1, handle_receive_msg/2, handle_receive/2]).
 
 
 connect() ->
@@ -31,7 +31,7 @@ loop(Socket) ->
 
   io:format("SENT VIA TCP PROTOCOL - ~p - BINARY - ~p - START RECEIVING - ~p ~n", [Input, BinInput, Socket]),
 
-  handle_receive(fun() -> loop(Socket) end).
+  handle_receive(Socket, fun() -> loop(Socket) end).
 
 handle_input(eof) ->
   io:format("INPUT ENDED, STOPPING LOOP ~n", []),
@@ -39,11 +39,12 @@ handle_input(eof) ->
 handle_input({_Error, _ErrorDescr} = Error) -> exit(Error);
 handle_input(Input) -> string:to_lower(string:trim(Input)).
 
-handle_receive(Callback) ->
+handle_receive(Socket, Callback) ->
   receive
     Response -> handle_receive_msg(Response, Callback)
   after ?CLIENT_RESPONSE_TIMEOUT ->
-    io:format("SOCKET CONECTION TIMEOUT - PID TIMEOUT - ~p ~n", [self()])
+    io:format("SOCKET CONECTION TIMEOUT - PID TIMEOUT - ~p ~n", [self()]),
+    gen_tcp:close(Socket)
   end.
 
 
